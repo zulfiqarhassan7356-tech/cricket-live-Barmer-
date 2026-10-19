@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cricket Live Score India</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f0f4f8;
+  color:#17202a
+}
+header{
+  background:#075e35;
+  color:white;
+  text-align:center;
+  padding:25px 10px
+}
+header h1{margin:5px;font-size:30px}
+.card{
+  background:white;
+  margin:15px;
+  padding:18px;
+  border-radius:15px;
+  box-shadow:0 2px 8px #0001
+}
+h2,h3{color:#075e35}
+input,select{
+  width:100%;
+  padding:12px;
+  margin:6px 0;
+  border:1px solid #ccc;
+  border-radius:7px;
+  font-size:16px
+}
+button{
+  background:#087443;
+  color:white;
+  border:0;
+  border-radius:7px;
+  padding:12px;
+  margin:4px 2px;
+  font-size:16px;
+  cursor:pointer
+}
+.score{
+  background:#064b2c;
+  color:white;
+  text-align:center;
+  padding:20px;
+  border-radius:12px
+}
+.score h2{color:white;font-size:34px;margin:8px}
+.buttons{display:flex;flex-wrap:wrap;gap:5px}
+.buttons button{flex:1;min-width:65px}
+table{width:100%;border-collapse:collapse}
+th,td{
+  border-bottom:1px solid #ddd;
+  padding:10px 4px;
+  text-align:center
+}
+.small{font-size:13px;color:#666}
+footer{text-align:center;padding:20px;color:#555}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🏏 Cricket Live Score India</h1>
+  <p>अपने गाँव के क्रिकेट मैच का लाइव स्कोर</p>
+</header>
+
+<div class="card">
+  <h3>🔴 LIVE MATCH</h3>
+
+  <label>पहली टीम का नाम</label>
+  <input id="team1" value="गाँव की टीम 1">
+
+  <label>दूसरी टीम का नाम</label>
+  <input id="team2" value="गाँव की टीम 2">
+
+  <button onclick="saveTeams()">टीम के नाम सेव करें</button>
+
+  <div class="score">
+    <div id="battingTeam">गाँव की टीम 1</div>
+    <h2><span id="runs">0</span>/<span id="wickets">0</span></h2>
+    <p>ओवर: <span id="overs">0.0</span></p>
+    <p id="status">मैच शुरू होने वाला है</p>
+  </div>
+
+  <h3>रन अपडेट करें</h3>
+  <div class="buttons">
+    <button onclick="addRuns(0)">डॉट बॉल</button>
+    <button onclick="addRuns(1)">+1</button>
+    <button onclick="addRuns(2)">+2</button>
+    <button onclick="addRuns(3)">+3</button>
+    <button onclick="addRuns(4)"> चौका 4</button>
+    <button onclick="addRuns(6)">छक्का 6</button>
+  </div>
+
+  <div class="buttons">
+    <button onclick="addWicket()">❌ विकेट</button>
+    <button onclick="undoBall()">↩️ पिछली गेंद हटाएँ</button>
+    <button onclick="resetMatch()">नया मैच</button>
+  </div>
+
+  <p class="small">
+    ध्यान दें: इस संस्करण में रन और गेंदों का हिसाब इसी ब्राउज़र में सेव होता है।
+  </p>
+</div>
+
+<div class="card">
+  <h3>🏏 बल्लेबाज़ की जानकारी</h3>
+
+  <input id="batterName" placeholder="बल्लेबाज़ का नाम">
+  <input id="batterRuns" type="number" min="0" placeholder="बल्लेबाज़ के रन">
+  <input id="batterBalls" type="number" min="0" placeholder="खेली गई गेंदें">
+  <input id="batter4" type="number" min="0" placeholder="चौके">
+  <input id="batter6" type="number" min="0" placeholder="छक्के">
+
+  <button onclick="saveBatter()">बल्लेबाज़ सेव करें</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>नाम</th><th>रन</th><th>गेंदें</th><th>4</th><th>6</th>
+      </tr>
+    </thead>
+    <tbody id="batterTable"></tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>🎯 गेंदबाज़ की जानकारी</h3>
+
+  <input id="bowlerName" placeholder="गेंदबाज़ का नाम">
+  <input id="bowlerOvers" type="number" min="0" step="0.1" placeholder="ओवर">
+  <input id="bowlerRuns" type="number" min="0" placeholder="दिए गए रन">
+  <input id="bowlerWickets" type="number" min="0" placeholder="विकेट">
+
+  <button onclick="saveBowler()">गेंदबाज़ सेव करें</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>नाम</th><th>ओवर</th><th>रन</th><th>विकेट</th>
+      </tr>
+    </thead>
+    <tbody id="bowlerTable"></tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>🏆 मैच का परिणाम</h3>
+  <input id="result" placeholder="यहाँ मैच का परिणाम लिखें">
+  <button onclick="saveResult()">परिणाम सेव करें</button>
+  <p id="resultText">मैच जारी है।</p>
+</div>
+
+<footer>
+  🏏 Cricket Live Score India
+  <p>गाँव का क्रिकेट, सबका क्रिकेट!</p>
+</footer>
+
+<script>
+let state = {
+  team1:"गाँव की टीम 1",
+  team2:"गाँव की टीम 2",
+  runs:0,
+  wickets:0,
+  balls:0,
+  batters:[],
+  bowlers:[],
+  result:"मैच जारी है।",
+  history:[]
+};
+
+function loadState(){
+  try{
+    const saved=localStorage.getItem("villageCricketScore");
+    if(saved) state=JSON.parse(saved);
+  }catch(e){}
+  render();
+}
+
+function saveState(){
+  localStorage.setItem("villageCricketScore",JSON.stringify(state));
+  render();
+}
+
+function saveTeams(){
+  state.team1=document.getElementById("team1").value.trim()||"टीम 1";
+  state.team2=document.getElementById("team2").value.trim()||"टीम 2";
+  saveState();
+}
+
+function addRuns(n){
+  state.history.push({
+    runs:state.runs,
+    wickets:state.wickets,
+    balls:state.balls
+  });
+  state.runs+=n;
+  state.balls++;
+  saveState();
+}
+
+function addWicket(){
+  if(state.wickets>=10){
+    alert("10 विकेट हो चुके हैं!");
+    return;
+  }
+  state.history.push({
+    runs:state.runs,
+    wickets:state.wickets,
+    balls:state.balls
+  });
+  state.wickets++;
+  state.balls++;
+  saveState();
+}
+
+function undoBall(){
+  if(!state.history.length){
+    alert("हटाने के लिए कोई गेंद नहीं है");
+    return;
+  }
+  const previous=state.history.pop();
+  state.runs=previous.runs;
+  state.wickets=previous.wickets;
+  state.balls=previous.balls;
+  saveState();
+}
+
+function resetMatch(){
+  if(!confirm("क्या आप नया मैच शुरू करना चाहते हैं?"))return;
+  state.runs=0;
+  state.wickets=0;
+  state.balls=0;
+  state.history=[];
+  state.batters=[];
+  state.bowlers=[];
+  state.result="मैच जारी है।";
+  saveState();
+}
+
+function saveBatter(){
+  const name=document.getElementById("batterName").value.trim();
+  if(!name){alert("बल्लेबाज़ का नाम लिखें");return;}
+
+  state.batters.push({
+    name:name,
+    runs:Number(document.getElementById("batterRuns").value)||0,
+    balls:Number(document.getElementById("batterBalls").value)||0,
+    fours:Number(document.getElementById("batter4").value)||0,
+    sixes:Number(document.getElementById("batter6").value)||0
+  });
+
+  saveState();
+  document.getElementById("batterName").value="";
+}
+
+function saveBowler(){
+  const name=document.getElementById("bowlerName").value.trim();
+  if(!name){alert("गेंदबाज़ का नाम लिखें");return;}
+
+  state.bowlers.push({
+    name:name,
+    overs:Number(document.getElementById("bowlerOvers").value)||0,
+    runs:Number(document.getElementById("bowlerRuns").value)||0,
+    wickets:Number(document.getElementById("bowlerWickets").value)||0
+  });
+
+  saveState();
+  document.getElementById("bowlerName").value="";
+}
+
+function saveResult(){
+  state.result=document.getElementById("result").value.trim()||"मैच जारी है।";
+  saveState();
+}
+
+function render(){
+  document.getElementById("team1").value=state.team1;
+  document.getElementById("team2").value=state.team2;
+  document.getElementById("battingTeam").textContent=state.team1;
+  document.getElementById("runs").textContent=state.runs;
+  document.getElementById("wickets").textContent=state.wickets;
+
+  const completeOvers=Math.floor(state.balls/6);
+  const remainingBalls=state.balls%6;
+  document.getElementById("overs").textContent=
+    completeOvers+"."+remainingBalls;
+
+  document.getElementById("status").textContent=
+    state.wickets>=10?"सभी विकेट गिर गए": "मैच जारी है";
+
+  document.getElementById("batterTable").innerHTML=
+    state.batters.map(p=>`<tr>
+      <td>${escapeHTML(p.name)}</td>
+      <td>${p.runs}</td><td>${p.balls}</td>
+      <td>${p.fours}</td><td>${p.sixes}</td>
+    </tr>`).join("");
+
+  document.getElementById("bowlerTable").innerHTML=
+    state.bowlers.map(p=>`<tr>
+      <td>${escapeHTML(p.name)}</td>
+      <td>${p.overs}</td><td>${p.runs}</td>
+      <td>${p.wickets}</td>
+    </tr>`).join("");
+
+  document.getElementById("resultText").textContent=state.result;
+  document.getElementById("result").value=state.result;
+}
+
+function escapeHTML(text){
+  return String(text).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",
+    '"':"&quot;","'":"&#39;"
+  })[c]);
+}
+
+loadState();
+</script>
+
+</body>
+</html>
